@@ -3,22 +3,19 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const userRoute = require("./routes/userroutes");
+const taskRoute = require("./routes/taskRoutes");
+
 app.use(cors());
 app.use(express.json());
 const mongoose = require("mongoose");
 
 
-
-app.post("/api/message",async (req, res) => { console.log('red'); res.send(200)})
+app.use('/api/task',taskRoute)
 app.use("/api/users", userRoute);
 app.listen(8080, () => {
   console.log("seervers connected");
 });
 
-app.get("/hello", (req, res) => {
-    res.send("hello world");
-      
-  });
 
 
 const uri =
