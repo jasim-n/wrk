@@ -82,11 +82,8 @@ Router.put("/up",async(req,res)=>{
   const taskcheck = await Task.findOne({ user_id: req.body.userid });
   if (!taskcheck) return res.status(400).send({ msg: "thier are no tasks" });
   let up = await Task.updateOne(
-    { _id: taskcheck._id },
-     {$set: {
-      taskList: { task: req.body.task },
-    
-  }}
+    { _id: taskcheck._id, "taskList.taskid": req.body.taskid },
+    { $set: { "taskList.$.task": req.body.task } }
   );
   console.log(up)
   return res.send({msg:'done'})
