@@ -73,10 +73,9 @@ Router.get("/show", async (req, res) => {
   if (!user) return res.status(400).send({ msg: "thier are no tasks" });
   const taskcheck = await Task.findOne({ user_id: req.body.userid });
   if (!taskcheck) return res.status(400).send({ msg: "thier are no tasks" });
-return res.status(200).send({data:taskcheck.taskList})
-
+  return res.status(200).send({ data: taskcheck.taskList });
 });
-Router.put("/up",async(req,res)=>{
+Router.put("/up", async (req, res) => {
   let user = await Users.findOne({ _id: req.body.userid });
   if (!user) return res.status(400).send({ msg: "thier are no tasks" });
   const taskcheck = await Task.findOne({ user_id: req.body.userid });
@@ -85,7 +84,7 @@ Router.put("/up",async(req,res)=>{
     { _id: taskcheck._id, "taskList.taskid": req.body.taskid },
     { $set: { "taskList.$.task": req.body.task } }
   );
-  console.log(up)
-  return res.send({msg:'done'})
-})
+  console.log(up);
+  return res.send({ msg: "done" });
+});
 module.exports = Router;
