@@ -2,10 +2,11 @@ const express = require("express");
 const { Task } = require("../Models/Todo");
 const { Users } = require("../Models/User.model");
 const mongoose = require("mongoose");
+const auth = require("../Middleware/authorizer");
 
 const Router = express.Router();
 
-Router.post("/add", async (req, res) => {
+Router.post("/add",auth, async (req, res) => {
   try {
     if (req.body.userid.length != 24)
       return res.status(400).send({ message: "Invalid id" });
@@ -45,18 +46,18 @@ Router.post("/add", async (req, res) => {
   }
 });
 
-Router.delete("/del", async (req, res) => {
+Router.delete("/del",auth, async (req, res) => {
   try {
-    let user = await Users.findOne({ _id: req.body.userid });
+    let user = await Users.findOne({ _id: req.query.userid });
     if (!user) return res.status(400).send({ msg: "thier are no tasks" });
-    const taskcheck = await Task.findOne({ user_id: req.body.userid });
+    const taskcheck = await Task.findOne({ user_id: req.query.userid });
     if (!taskcheck) return res.status(400).send({ msg: "thier are no tasks" });
 
     let up = await Task.updateOne(
       { _id: taskcheck._id },
       {
         $pull: {
-          taskList: { task: req.body.task },
+          taskList: { task: req.query.task },
         },
       }
     );
@@ -68,18 +69,25 @@ Router.delete("/del", async (req, res) => {
   }
 });
 
-Router.get("/show", async (req, res) => {
-  let user = await Users.findOne({ _id: req.body.userid });
-  if (!user) return res.status(400).send({ msg: "thier are no tasks" });
-  const taskcheck = await Task.findOne({ user_id: req.body.userid });
-  if (!taskcheck) return res.status(400).send({ msg: "thier are no tasks" });
-  return res.status(200).send({ data: taskcheck.taskList });
+Router.get("/show",auth, async (req, res) => {
+    try {
+        let user = await Users.findOne({ _id: req.query.userid });
+        if (!user) return res.status(400).send({ msg: "thier are no tasks" });
+        const taskcheck = await Task.findOne({ user_id: req.query.userid  });
+        if (!taskcheck) return res.status(400).send({ msg: "thier are no tasks" });
+        return res.status(200).send({ data: taskcheck.taskList });
+        
+    } catch (error) {
+        console.log(error)
+    }
+ 
 });
-Router.put("/up", async (req, res) => {
+Router.put("/up",auth, async (req, res) => {
   let user = await Users.findOne({ _id: req.body.userid });
   if (!user) return res.status(400).send({ msg: "thier are no tasks" });
   const taskcheck = await Task.findOne({ user_id: req.body.userid });
   if (!taskcheck) return res.status(400).send({ msg: "thier are no tasks" });
+  console.log(taskcheck)
   let up = await Task.updateOne(
     { _id: taskcheck._id, "taskList.taskid": req.body.taskid },
     { $set: { "taskList.$.task": req.body.task } }

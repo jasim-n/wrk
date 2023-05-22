@@ -22,6 +22,7 @@ Router.post("/signup", async (req, res) => {
 });
 
 Router.post("/signin", async (req, res) => {
+  console.log('user signin hitted')
   let user = await Users.findOne({ email: req.body.email });
   console.log(req.body);
   if (!user) return res.status(400).send({ msg: "No such User found", user });
